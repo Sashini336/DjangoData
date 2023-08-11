@@ -1,6 +1,8 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Ads
+
+from Ads.automoto import scrape_single_ad
+from .models import Ads, Image, MainImage, Price
 from .serializers import AdsSerializer
 from rest_framework import viewsets
 from django.contrib.auth.models import User
@@ -24,5 +26,29 @@ def add_url(request):
     elif request.method == 'POST':
         data = request.data
         url = data.get("data")
-        call_command('automoto', url) 
+        ad_data = scrape_single_ad(url)
+        if ad_data:
+            image_urls = ad_data.pop("image_urls")
+            price = ad_data.pop("price")
+            
+            
+            ad_instance = Ads.objects.create(**ad_data)
+            
+            if ad_instance:
+             image_instances = []
+             for image_url in image_urls:
+              image_instance, created = Image.objects.get_or_create(ad=ad_instance, image=image_url)
+             else:
+                 print("error")
+                 
+
+                
+            ad_instance.images.set(image_instances)
+            price_instance = Price.objects.create(amount=price, ad=ad_instance)
+            
+            print('Success: Data processed and saved')
+        else:
+            print('Error: Failed to scrape ad information')
+
         return Response({"message": "Raboti"}) 
+    
