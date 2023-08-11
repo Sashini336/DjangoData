@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import AdsViewSet
+from .views import AdsViewSet, add_url
 from .models import Ad
 from serializers import AdsSerializer
 from rest_framework import status
@@ -12,27 +12,11 @@ from Ads import views
 router = DefaultRouter()
 router.register(r'ads', AdsViewSet)
 
-
 urlpatterns = [
     path('', include(router.urls)),
     path('ads', views.ads_list),
     path('ads/<int:id>/', views.ads_detail),
+    path('add_url/', add_url, name='add-url'),  
 ]
 
-urlpattern = format_suffix_patterns(urlpatterns)
-
-
-@api_view(['GET', 'POST'])
-def snippet_list(request):
-    
-    if request.method == 'GET':
-        ads = Ad.objects.all()
-        serializer = AdsSerializer(ads, many=True)
-        return Response(serializer.data)
-
-    elif request.method == 'POST':
-        serializer = AdsSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+urlpatterns = format_suffix_patterns(urlpatterns)
