@@ -119,12 +119,10 @@ def extract_info(soup, link):
         'fuel_type': fuel_type,
         'transmission': transmission,
         'horsepower': horsepower,
-        'engine_liters': engine_liters,
-        'doors': doors,
         'color': color,
-        'image': image,
+        'main_image': image,
         'image_urls': image_urls,
-        'moreInformation': more_information
+        'more_information': more_information
     }
 def scrape_single_ad(url):
     try:
