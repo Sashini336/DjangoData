@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-import json
-import os
+
 
 def extract_more_information(soup):
     more_information = []
@@ -120,14 +119,12 @@ def extract_info(soup, link):
         'fuel_type': fuel_type,
         'transmission': transmission,
         'horsepower': horsepower,
-        'engine_liters': engine_liters,
-        'doors': doors,
         'color': color,
-        'image': image,
+        'main_image': image,
         'image_urls': image_urls,
-        'moreInformation': more_information
+        'more_information': more_information
     }
-def scrape_single_ad(link):
+def scrape_single_ad(url):
     try:
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
@@ -135,14 +132,13 @@ def scrape_single_ad(link):
             'Accept-Language': 'en-US,en;q=0.5',
         }
 
-        response = requests.get(link, headers=headers)
+        response = requests.get(url, headers=headers)
         response.raise_for_status()
 
         soup = BeautifulSoup(response.content, 'html.parser')
-        info = extract_info(soup, link)
+        info = extract_info(soup, url)
         return info
 
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching the website: {e}")
+        print(f"Error dokato se opitva da scrapne datata:  {e}")
         return None
-    
