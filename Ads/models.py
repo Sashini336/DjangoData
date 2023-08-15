@@ -8,13 +8,13 @@ class MainImage(models.Model):
 class Ads(models.Model):
     url = models.CharField(max_length=255, default='', blank=True)
     title = models.CharField(max_length=255, default='', blank=True, null=True)
-    year = models.CharField(max_length=255, default='', blank=True)
-    millage = models.CharField(max_length=255, default='', blank=True)
-    fuel_type = models.CharField(max_length=255, default='',blank=True)
-    transmission = models.CharField(max_length=255, default='', blank=True)
-    horsepower = models.CharField(max_length=255, default='', blank=True)
-    color = models.CharField(max_length=255, default='')
-    more_information = models.CharField(max_length=3000, default='' , blank=True)
+    year = models.CharField(max_length=255, default='', blank=True , null=True)
+    millage = models.CharField(max_length=255, default='', blank=True, null=True)
+    fuel_type = models.CharField(max_length=255, default='',blank=True, null=True)
+    transmission = models.CharField(max_length=255, default='', blank=True, null=True)
+    horsepower = models.CharField(max_length=255, default='', blank=True, null=True)
+    color = models.CharField(max_length=255, default='', blank=True , null=True)
+    more_information = models.CharField(max_length=3000, default='' , blank=True, null=True)
     main_image = models.CharField(default='', max_length=255)
     
     def __str__(self):
@@ -31,3 +31,5 @@ class Price(models.Model):
     price = models.CharField(max_length=255, default='')
     date = models.DateField((""),auto_now_add=True)
     ad = models.ForeignKey(Ads, default='', related_name='price', max_length=255, on_delete=models.CASCADE)
+    class Meta:
+        ordering = ['-date']

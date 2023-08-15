@@ -24,13 +24,13 @@ class ImageSerializer(serializers.ModelSerializer):
 class PriceSerializer(serializers.ModelSerializer):
     class Meta:
         model  = Price
-        fields = ['price']
+        fields = ['price', 'date']
         
         
 class AdsSerializer(serializers.ModelSerializer):
     main_image = MainImageSerializer()
     images = ImageSerializer(many=True)
-    price = PriceSerializer()
+    price = PriceSerializer(many=True)
     class Meta: 
         model = Ads
         fields = ['id', 'url', 'title', 'price', 'year', 'millage', 'fuel_type', 'transmission', 'horsepower', 'color', 'more_information', 'main_image', 'images']

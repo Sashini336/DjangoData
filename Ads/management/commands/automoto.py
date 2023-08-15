@@ -1,6 +1,5 @@
 from django.core.management import BaseCommand
 from Ads.automoto import scrape_single_ad
-from bs4 import BeautifulSoup
 
 
 class Command(BaseCommand):

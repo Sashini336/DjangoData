@@ -2,127 +2,71 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def extract_more_information(soup):
-    more_information = []
-
-    title_info_div = soup.find_all('div', class_='col-md-12')[3]
-    br_elements = title_info_div.find_all('br')
-    for br in br_elements:
-        info = br.next_sibling.strip()
-        more_information.append(info)
-
-    return more_information
-
 def extract_info(soup, link):
     title = None
     year = None
     millage = None
-    fuel_type = None
     transmission = None
     horsepower = None
-    engine_liters = None
-    doors = None
     color = None
-
     
-    title_element = soup.find('h1', class_='post-title')
-    title = title_element.text.strip() if title_element else None
 
-    article_element = soup.find('article', class_='single-vehicle-details')
-    row_element = article_element.find('div', class_='row')
-    col_md_6_element = row_element.find_all('div', class_='col-md-6')[5]
-    row_2_element = col_md_6_element.find_all('div', class_='column')
+    div_with_margin = soup.find('div', style='margin-top:17px;')
+
+    table = div_with_margin.find('table')
     
+    title_h1 = soup.find('h1')
     
-    image_elements = col_md_6_element.find_all('div', class_='column')
+    title = title_h1.text.strip()
 
-    for image_element in image_elements:
-        image = image_element.find('img', src=True)
-        if image:
-            image = image['src']
-            break
-
-        
+    price_div = soup.find('span' , id="details_price")
+    
+    price = price_div.text.strip()
+    
+    main_image_holder = soup.find('img', id="bigPictureCarousel")
+    
+    image = main_image_holder.get('src')
+    
+    images_holder = soup.find('div', id="pictures_moving_details_small")
+    
+    a_elements = images_holder.find_all('a')
+    
     image_urls = []
 
-    for div in row_2_element:
-        img_tag = div.find('img')
-        if img_tag and 'src' in img_tag.attrs:
-            image_url = img_tag['src']
-            image_urls.append(image_url)
+    for a_element  in a_elements:
+        image = a_element.get('data-link')
+        if image:
+            image_urls.append(image)
             
-            
-    price_element_find = row_element.find_all('div', class_='col-md-6')[2]
+    more_info_specs = soup.find('ul', class_="dilarData")
     
-    
-    price_element = price_element_find.find('p', class_='detail-price')
-    
-    price = price_element.text.strip()
-    
-    more_information = extract_more_information(soup)
+    li_elements = more_info_specs.find_all('li')
 
-    ul_element = soup.find('div', class_='options-left').find('ul')
-    if ul_element:
-        li_items = ul_element.find_all('li')
+    label_to_index = {
+        "year": 1,
+        "fuel_type": 3,
+        "horsepower": 5,
+        "transmission": 9,
+        # "type": 11,
+        "millage": 13,
+        "color": 15,
+    }
 
-        try:
-            year = li_items[0].text.strip()
-        except IndexError:
-            pass
+    specs_dict = {}  
 
-        try:
-            millage = li_items[1].text.strip()
-        except IndexError:
-            pass
-
-        try:
-            fuel_type = li_items[2].text.strip()
-        except IndexError:
-            pass
-
-        try:
-            transmission = li_items[3].text.strip()
-        except IndexError:
-            pass
-
-    ul_element_right = soup.find('div', class_='options-right').find('ul')
-    if ul_element_right:
-        li_items_right = ul_element_right.find_all('li')
-
-        try:
-            horsepower = li_items_right[0].text.strip()
-        except IndexError:
-            pass
-
-        try:
-            engine_liters = li_items_right[1].text.strip()
-        except IndexError:
-            pass
-
-        try:
-            doors = li_items_right[2].text.strip()
-        except IndexError:
-            pass
-
-        try:
-            color = li_items_right[3].text.strip()
-        except IndexError:
-            pass
+    for label, index in label_to_index.items():
+        info_value = li_elements[index].text.strip()
+        specs_dict[label] = info_value
         
 
     return {
-        'url' : link,
+        'url': link,
         'title': title,
         'price': price,
-        'year': year,
-        'millage': millage,
-        'fuel_type': fuel_type,
-        'transmission': transmission,
-        'horsepower': horsepower,
-        'color': color,
         'main_image': image,
         'image_urls': image_urls,
-        'more_information': more_information
+        **{key: value for key, value in specs_dict.items() if key in ('year', 'fuel_type', 'horsepower', 'transmission', 'millage', 'color')}
+        
     }
 def scrape_single_ad(url):
     try:
